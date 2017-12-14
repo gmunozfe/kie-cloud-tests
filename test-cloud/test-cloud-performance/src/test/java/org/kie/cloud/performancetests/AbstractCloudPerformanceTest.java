@@ -80,7 +80,7 @@ public abstract class AbstractCloudPerformanceTest<T extends DeploymentScenario>
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractCloudPerformanceTest.class);
 
-    private final DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
+    private /*final*/ DeploymentScenarioBuilderFactory deploymentScenarioFactory /*= DeploymentScenarioBuilderFactoryLoader.getInstance()*/;
 
 
     protected T deploymentScenario;
