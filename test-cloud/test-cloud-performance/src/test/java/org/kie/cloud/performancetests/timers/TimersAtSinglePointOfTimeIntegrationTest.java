@@ -37,6 +37,7 @@ import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.cloud.performancetests.AbstractCloudPerformanceTest;
 import org.kie.cloud.performancetests.util.RunnableWrapper;
 import org.kie.server.api.exception.KieServicesHttpException;
+import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.client.KieServicesClient;
@@ -237,14 +238,26 @@ public class TimersAtSinglePointOfTimeIntegrationTest extends AbstractCloudPerfo
         logger.debug("Active processes count: {}", activeProcesses.size());
         Assertions.assertThat(activeProcesses).isEmpty();
 
+        QueryDefinition query = new QueryDefinition();
+        query.setName("completedProcessInstances");
+        query.setSource("java:jboss/datasources/jbpmDS");
+        query.setExpression("select processinstanceid from ProcessInstanceLog where status = 2");
+        query.setTarget("PROCESS");
+
+        queryServicesClient.registerQuery(query);
+
         int numberOfPages = 1 + (PROCESSES_COUNT / 5000);// including one additional page to check there are no more processes
 
         List<ProcessInstance> completedProcesses = new ArrayList<>(PROCESSES_COUNT);
 
         for (int i = 0; i < numberOfPages; i++) {
-            List<ProcessInstance> response = queryServicesClient.findProcessInstancesByStatus(Collections.singletonList(org.jbpm.process.instance.ProcessInstance.STATE_COMPLETED), i, 5000);
-            completedProcesses.addAll(response);
+            logger.debug("Receiving page no. {}", i);
+            List<ProcessInstance> response = queryServicesClient.query(query.getName(), QueryServicesClient.QUERY_MAP_PI, i, 5000, ProcessInstance.class);
             logger.debug("Received page no. {}", i);
+            //List<ProcessInstance> response = queryServicesClient.findProcessInstancesByStatus(Collections.singletonList(org.jbpm.process.instance.ProcessInstance.STATE_COMPLETED), i, 5000);
+            logger.debug("Adding page no. {} to collection", i);
+            completedProcesses.addAll(response);
+            logger.debug("Page no. {} added to collection", i);
         }
 
         logger.debug("Completed processes count: {}", completedProcesses.size());
