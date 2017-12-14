@@ -262,7 +262,7 @@ public class TimersAtSinglePointOfTimeIntegrationTest extends AbstractCloudPerfo
             updateDistribution(startedHostNameDistribution, hostNameHistory.get(0).getOldValue());
             updateDistribution(completedHostNameDistribution, hostNameHistory.get(0).getValue());
 
-            if (++i % 100 == 0) {
+            if (++i % 1000 == 0) {
                 logger.debug("{} processes validated", i);
             }
         }
