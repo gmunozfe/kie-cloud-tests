@@ -234,17 +234,21 @@ public class TimersAtSinglePointOfTimeIntegrationTest extends AbstractCloudPerfo
     }
 
     private void gatherAndAssertStatistics() {
-        List<ProcessInstance> activeProcesses = queryServicesClient.findProcessInstancesByStatus(Collections.singletonList(org.jbpm.process.instance.ProcessInstance.STATE_ACTIVE), 0, 10);
+        // to speed up pagination
+        KieServicesClient kieStatisticsClient = createKieServerClient("http://" + BRMS_PERF_PREFIX + "01" + PERF_LAB_SUFFIX + ":" + KIE_SERVER_PORT + KIE_SERVER_CONTEXT, KIE_SERVER_USER, KIE_SERVER_PASSWORD);
+        QueryServicesClient queryClient = kieStatisticsClient.getServicesClient(QueryServicesClient.class);
+
+        List<ProcessInstance> activeProcesses = queryClient.findProcessInstancesByStatus(Collections.singletonList(org.jbpm.process.instance.ProcessInstance.STATE_ACTIVE), 0, 10);
         logger.debug("Active processes count: {}", activeProcesses.size());
         Assertions.assertThat(activeProcesses).isEmpty();
 
-        QueryDefinition query = new QueryDefinition();
+        /*QueryDefinition query = new QueryDefinition();
         query.setName("completedProcessInstances");
         query.setSource("java:jboss/datasources/jbpmDS");
         query.setExpression("select processinstanceid from ProcessInstanceLog where status = 2");
         query.setTarget("PROCESS");
 
-        queryServicesClient.registerQuery(query);
+        queryClient.registerQuery(query);*/
 
         int numberOfPages = 1 + (PROCESSES_COUNT / 5000);// including one additional page to check there are no more processes
 
@@ -252,9 +256,10 @@ public class TimersAtSinglePointOfTimeIntegrationTest extends AbstractCloudPerfo
 
         for (int i = 0; i < numberOfPages; i++) {
             logger.debug("Receiving page no. {}", i);
-            List<ProcessInstance> response = queryServicesClient.query(query.getName(), QueryServicesClient.QUERY_MAP_PI, i, 5000, ProcessInstance.class);
+            List<ProcessInstance> response = queryClient.findProcessInstancesByStatus(Collections.singletonList(org.jbpm.process.instance.ProcessInstance.STATE_COMPLETED), i, 5000);
+            //List<ProcessInstance> response = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_PI, i, 5000, ProcessInstance.class);
             logger.debug("Received page no. {}", i);
-            //List<ProcessInstance> response = queryServicesClient.findProcessInstancesByStatus(Collections.singletonList(org.jbpm.process.instance.ProcessInstance.STATE_COMPLETED), i, 5000);
+
             logger.debug("Adding page no. {} to collection", i);
             completedProcesses.addAll(response);
             logger.debug("Page no. {} added to collection", i);
@@ -269,7 +274,7 @@ public class TimersAtSinglePointOfTimeIntegrationTest extends AbstractCloudPerfo
         int i = 0;
         for (ProcessInstance pi : completedProcesses) {
             long pid = pi.getId();
-            List<VariableInstance> hostNameHistory = queryServicesClient.findVariableHistory(pid, "hostName", 0, 10);
+            List<VariableInstance> hostNameHistory = queryClient.findVariableHistory(pid, "hostName", 0, 10);
             Assertions.assertThat(hostNameHistory).hasSize(2);
             // Values are DESC by ID, i.e. time
             updateDistribution(startedHostNameDistribution, hostNameHistory.get(0).getOldValue());
