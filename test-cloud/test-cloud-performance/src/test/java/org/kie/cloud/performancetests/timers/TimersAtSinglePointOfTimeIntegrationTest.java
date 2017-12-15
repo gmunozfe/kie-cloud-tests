@@ -165,7 +165,7 @@ public class TimersAtSinglePointOfTimeIntegrationTest extends AbstractCloudPerfo
 
         Assertions.assertThat(Instant.now()).isBefore(fireAtTime.toInstant());
 
-        Duration waitForCompletionDuration = Duration.between(Instant.now(), fireAtTime).plus(Duration.of(20, ChronoUnit.MINUTES));
+        Duration waitForCompletionDuration = Duration.between(Instant.now(), fireAtTime).plus(Duration.of(30, ChronoUnit.MINUTES));
 
         logger.info("Waiting for process instances to be completed, max waiting time is {}", waitForCompletionDuration);
         waitForAllProcessesToComplete(waitForCompletionDuration);
