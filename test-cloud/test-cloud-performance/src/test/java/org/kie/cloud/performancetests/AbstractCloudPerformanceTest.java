@@ -38,7 +38,7 @@ public abstract class AbstractCloudPerformanceTest<T extends DeploymentScenario>
     protected static final String CONTAINER_ID = "timers-container";
     protected static final String CONTAINER_ALIAS = "cont-alias";
 
-    protected static final String ONE_TIMER_PROCESS_ID = "timers-testing.OneTimer";
+    protected static final String ONE_TIMER_DATE_PROCESS_ID = "timers-testing.OneTimerDate";
 
 
     protected static final String DEFINITION_PROJECT_SNAPSHOT_NAME = "definition-project-snapshot";

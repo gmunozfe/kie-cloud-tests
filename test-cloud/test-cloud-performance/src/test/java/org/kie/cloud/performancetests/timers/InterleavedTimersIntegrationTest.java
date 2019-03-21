@@ -1,18 +1,3 @@
-/*
- * Copyright 2017 Red Hat, Inc. and/or its affiliates.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
-*/
-
 package org.kie.cloud.performancetests.timers;
 
 import java.time.Duration;
@@ -27,6 +12,7 @@ import java.util.Map;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
+import org.kie.cloud.common.time.TimeUtils;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.client.KieServicesClient;
@@ -34,9 +20,19 @@ import org.kie.server.client.QueryServicesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TimersAtSinglePointOfTimeIntegrationTest extends AbstractTimersCloudPerformanceTest {
+public class InterleavedTimersIntegrationTest extends AbstractTimersCloudPerformanceTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(TimersAtSinglePointOfTimeIntegrationTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(InterleavedTimersIntegrationTest.class);
+
+    private static final int BATCH_COUNT = 5;
+    private static final int BATCH_SIZE = 1000;
+    private static final int BATCH_DELAY = 1000;
+    private static final int TIMER_DELAY = 1;
+
+    protected static final int PROCESSES_PER_THREAD = BATCH_SIZE / STARTING_THREADS_COUNT;
+
+    protected static final String ONE_TIMER_DURATION_PROCESS_ID = "timers-testing.OneTimerDate";
+
 
     @Test
     public void testScenario() {
@@ -52,7 +48,42 @@ public class TimersAtSinglePointOfTimeIntegrationTest extends AbstractTimersClou
     // ========== HELPER METHODS ==========
 
     private void runSingleScenario() {
-        OffsetDateTime fireAtTime = calculateFireAtTime();
+        Instant scenarioStartTime = Instant.now();
+
+        logger.info("Starting {} batches", BATCH_COUNT);
+        for (int i = 0; i < BATCH_COUNT;) {
+            logger.info("Starting batch no. {}", i);
+
+            logger.info("Starting {} processes", BATCH_SIZE);
+
+            Instant startTime = Instant.now();
+            // This is just to provide virtually "infinite" time to finish all iterations, i.e. maximum possible duration minus 1 hour,
+            // so we can be sure there won't be overflow
+            Duration maxDuration = Duration.between(startTime.plus(1, ChronoUnit.HOURS), Instant.MAX);
+            Map<String, Object> params = Collections.singletonMap("timerDelay", TIMER_DELAY);
+
+            startAndWaitForStartingThreads(STARTING_THREADS_COUNT, maxDuration, PROCESSES_PER_THREAD, getStartingRunnable(CONTAINER_ID, ONE_TIMER_DURATION_PROCESS_ID, params));
+
+            logger.info("Starting processes took: {}", Duration.between(startTime, Instant.now()));
+
+            Duration waitForCompletionDuration = Duration.of(20, ChronoUnit.MINUTES);
+            logger.info("Batch created. Waiting for a batch to be processed, max waiting time is {}", waitForCompletionDuration);
+            waitForAllProcessesToComplete(waitForCompletionDuration);
+
+            logger.info("Batch no. {} processed, took approximately {}", i, Duration.between(startTime, Instant.now()));
+
+            if (++i < BATCH_COUNT) {
+                logger.info("Waiting for another batch to be run in {} seconds", BATCH_DELAY);
+                TimeUtils.wait(Duration.of(BATCH_DELAY, ChronoUnit.SECONDS));
+            }
+        }
+        logger.info("Scenario took: {}", Duration.between(scenarioStartTime, Instant.now()));
+
+
+
+
+
+        /*OffsetDateTime fireAtTime = calculateFireAtTime();
 
         logger.info("Starting {} processes", PROCESSES_COUNT);
 
@@ -60,7 +91,8 @@ public class TimersAtSinglePointOfTimeIntegrationTest extends AbstractTimersClou
         // This is just to provide virtually "infinite" time to finish all iterations, i.e. maximum possible duration minus 1 hour,
         // so we can be sure there won't be overflow
         Duration maxDuration = Duration.between(startTime.plus(1, ChronoUnit.HOURS), Instant.MAX);
-        Map<String, Object> params = Collections.singletonMap("fireAt", fireAtTime.toString());
+        Map<String, Object> params = Collections.singletonMap("timerDelay", TIMER_DELAY);
+
         startAndWaitForStartingThreads(STARTING_THREADS_COUNT, maxDuration, PROCESSES_PER_THREAD, getStartingRunnable(CONTAINER_ID, ONE_TIMER_DATE_PROCESS_ID, params));
 
         logger.info("Starting processes took: {}", Duration.between(startTime, Instant.now()));
@@ -71,26 +103,12 @@ public class TimersAtSinglePointOfTimeIntegrationTest extends AbstractTimersClou
 
         logger.info("Waiting for process instances to be completed, max waiting time is {}", waitForCompletionDuration);
         waitForAllProcessesToComplete(waitForCompletionDuration);
-        logger.info("Process instances completed, took approximately {}", Duration.between(fireAtTime.toInstant(), Instant.now()));
+        logger.info("Process instances completed, took approximately {}", Duration.between(fireAtTime.toInstant(), Instant.now()));*/
 
-    }
-
-    private OffsetDateTime calculateFireAtTime() {
-        OffsetDateTime currentTime = OffsetDateTime.now();
-        long offsetInSeconds = Math.round(PROCESSES_COUNT / STARTING_THREADS_COUNT / PERF_INDEX);
-        OffsetDateTime fireAtTime = currentTime.plus(offsetInSeconds, ChronoUnit.SECONDS);
-        logger.info("fireAtTime set to {} which is the offset of {} seconds", fireAtTime, offsetInSeconds);
-
-        return fireAtTime;
     }
 
     private void updateDistribution(Map<String, Integer> distribution, String hostName) {
-        Integer count = distribution.get(hostName);
-        if (count == null) {
-            distribution.put(hostName, 1);
-        } else {
-            distribution.put(hostName, ++count);
-        }
+        distribution.merge(hostName, 1, (oldValue, newValue) -> ++oldValue);
     }
 
     private void gatherAndAssertStatistics() {
@@ -149,5 +167,7 @@ public class TimersAtSinglePointOfTimeIntegrationTest extends AbstractTimersClou
         logger.info("Processes were started with this distribution: {}", startedHostNameDistribution);
         logger.info("Processes were completed with this distribution: {}", completedHostNameDistribution);
     }
+
+
 
 }
