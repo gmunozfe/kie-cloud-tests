@@ -26,6 +26,7 @@ import org.kie.cloud.api.scenario.builder.KieServerWithDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerScenarioBuilder;
+import org.kie.cloud.api.scenario.builder.WorkbenchWithKieServerScenarioBuilder;
 import org.kie.cloud.api.settings.builder.ControllerSettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerSettingsBuilder;
@@ -161,6 +162,11 @@ public class ApbDeploymentBuilderFactory implements DeploymentScenarioBuilderFac
     @Override
     public EmployeeRosteringScenarioBuilder getEmployeeRosteringScenarioBuilder() {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
+    @Override
+    public WorkbenchWithKieServerScenarioBuilder getWorkbenchWithKieServerScenarioBuilder() {
+    	return null;
     }
 
 }

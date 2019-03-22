@@ -26,6 +26,7 @@ import org.kie.cloud.api.scenario.builder.KieServerWithDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerScenarioBuilder;
+import org.kie.cloud.api.scenario.builder.WorkbenchWithKieServerScenarioBuilder;
 import org.kie.cloud.api.settings.builder.ControllerSettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerSettingsBuilder;
@@ -172,4 +173,10 @@ public class TemplatesDeploymentBuilderFactory implements DeploymentScenarioBuil
             util.deleteProject();
         }
     }
+
+	@Override
+	public WorkbenchWithKieServerScenarioBuilder getWorkbenchWithKieServerScenarioBuilder() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

@@ -107,6 +107,12 @@
       </dependency>
       <dependency>
         <groupId>org.kie.cloud</groupId>
+        <artifactId>test-cloud-remote</artifactId>
+        <type>test-jar</type>
+        <version>${version.org.kie}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.cloud</groupId>
         <artifactId>cloud-deployment-plugin</artifactId>
         <version>${version.org.kie}</version>
       </dependency>

@@ -12,7 +12,7 @@ import java.util.Map;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-import org.kie.cloud.common.time.TimeUtils;
+import org.kie.cloud.integrationtests.util.TimeUtils;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.client.KieServicesClient;

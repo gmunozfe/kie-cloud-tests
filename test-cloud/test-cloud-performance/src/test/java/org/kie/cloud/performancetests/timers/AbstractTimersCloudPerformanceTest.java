@@ -11,7 +11,7 @@ import java.util.function.BooleanSupplier;
 import org.junit.Before;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario;
-import org.kie.cloud.common.time.TimeUtils;
+import org.kie.cloud.integrationtests.util.TimeUtils;
 import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.cloud.performancetests.AbstractCloudPerformanceTest;
 import org.kie.cloud.performancetests.util.RunnableWrapper;
@@ -21,7 +21,6 @@ import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
-import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +49,7 @@ public abstract class AbstractTimersCloudPerformanceTest extends AbstractCloudPe
     public static final double PERF_INDEX = Double.parseDouble(System.getProperty("perfIndex", "3.0"));
 
 
-    private KieServerMgmtControllerClient kieServerMgmtControllerClient;
+    //private KieServerMgmtControllerClient kieServerMgmtControllerClient;
     private KieServicesClient kieServicesClient;
     protected ProcessServicesClient processServicesClient;
     protected QueryServicesClient queryServicesClient;

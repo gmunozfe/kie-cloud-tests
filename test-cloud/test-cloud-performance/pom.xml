@@ -24,7 +24,6 @@
     <dependency>
       <groupId>org.kie.cloud</groupId>
       <artifactId>framework-cloud-api</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.kie.cloud</groupId>
@@ -39,6 +38,12 @@
   <dependency>
     <groupId>org.kie.cloud</groupId>
     <artifactId>framework-maven</artifactId>
+    <scope>test</scope>
+  </dependency>
+  <dependency>
+    <groupId>org.kie.cloud</groupId>
+    <artifactId>test-cloud-remote</artifactId>
+    <type>test-jar</type>
     <scope>test</scope>
   </dependency>
     <!--<dependency>
