@@ -15,6 +15,7 @@
  */
 package org.kie.cloud.openshift.settings.builder;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -186,4 +187,17 @@ public class KieServerS2ISettingsBuilderApb implements KieServerS2ISettingsBuild
         //extraVars.put(OpenShiftApbConstants.KIE_SERVER_HTTPS_SECRET, secret);
         //return this;
     }
+
+	@Override
+	public KieServerS2ISettingsBuilder withTimerServiceDataStoreRefreshInterval(
+			Duration timerServiceDataStoreRefreshInterval) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public KieServerS2ISettingsBuilder withKieServerMemoryLimit(String limit) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 }

@@ -15,6 +15,7 @@
  */
 package org.kie.cloud.openshift.scenario.builder;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -84,4 +85,5 @@ public class GenericScenarioBuilderApb implements GenericScenarioBuilder {
     public GenericScenarioBuilder withLdapSettings(LdapSettings ldapSettings) {
         throw new UnsupportedOperationException("Not supported yet.");
 	}
+
 }

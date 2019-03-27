@@ -15,6 +15,8 @@
  */
 package org.kie.cloud.api.scenario.builder;
 
+import java.time.Duration;
+
 import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.api.settings.LdapSettings;
@@ -88,4 +90,5 @@ public interface GenericScenarioBuilder extends DeploymentScenarioBuilder<Generi
      * @return Builder
      */
     GenericScenarioBuilder withLdapSettings(LdapSettings ldapSettings);
+    
 }
