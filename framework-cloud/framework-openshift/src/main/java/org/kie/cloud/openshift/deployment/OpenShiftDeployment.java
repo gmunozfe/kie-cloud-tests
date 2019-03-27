@@ -170,6 +170,20 @@ public abstract class OpenShiftDeployment implements Deployment {
             .endMetadata()
             .done();
     }
+    
+    @Override
+    public void setRouterBalance(String balance) {
+        // Route has a same name as its service.
+        String routeName = getServiceName();
+        util.client()
+            .routes()
+            .withName(routeName)
+            .edit()
+            .editMetadata()
+            .addToAnnotations("haproxy.router.openshift.io/balance", balance)
+            .endMetadata()
+            .done();
+    }
 
     private Instance createInstance(Pod pod) {
         String instanceName = pod.getMetadata().getName();

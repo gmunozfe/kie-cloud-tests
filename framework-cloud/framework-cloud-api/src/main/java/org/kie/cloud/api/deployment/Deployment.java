@@ -87,4 +87,6 @@ public interface Deployment {
      * This method resets a router timeout for the cloud deployment back to original value.
      */
     void resetRouterTimeout();
+
+	void setRouterBalance(String balance);
 }
