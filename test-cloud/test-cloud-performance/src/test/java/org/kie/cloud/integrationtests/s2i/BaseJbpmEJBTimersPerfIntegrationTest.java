@@ -140,6 +140,9 @@ public abstract class BaseJbpmEJBTimersPerfIntegrationTest extends AbstractMetho
 
     @Before
     public void setUp() {
+        if (SCALE_COUNT < 1) 
+            throw new RuntimeException("wrong scale parameter, should be equal or greater than 1");
+                
         // Scale Kie server to 0 to apply configuration changes.
         deploymentScenario.getKieServerDeployment().scale(0);
         deploymentScenario.getKieServerDeployment().waitForScale();
@@ -152,14 +155,9 @@ public abstract class BaseJbpmEJBTimersPerfIntegrationTest extends AbstractMetho
         limits.put(MEMORY, System.getProperty("limits.memory","4Gi"));
         deploymentScenario.getKieServerDeployment().setResources(requests, limits);
 
-        if (SCALE_COUNT >= 1) {
-            logger.info("starting to scale");
-            scaleKieServerTo(SCALE_COUNT);
-            logger.info("scaled to {} pods", SCALE_COUNT);
-        } else {
-            throw new RuntimeException("wrong scale parameter, should be equal or greater than 1");
-        }
-        
+        scaleKieServerTo(SCALE_COUNT);
+        addNameToPods();
+                
         deploymentScenario.getKieServerDeployment().setRouterTimeout(Duration.ofMinutes(ROUTER_TIMEOUT));
         deploymentScenario.getKieServerDeployment().setRouterBalance(ROUTER_BALANCE);
         
@@ -287,9 +285,14 @@ public abstract class BaseJbpmEJBTimersPerfIntegrationTest extends AbstractMetho
         logger.info("Processes were started with this distribution: {}", startedHostNameDistribution);       
     }
     
-    private void scaleKieServerTo(int count) {
+    protected void scaleKieServerTo(int count) {
+        logger.info("starting to scale to {} pods...", count);
         deploymentScenario.getKieServerDeployment().scale(count);
         deploymentScenario.getKieServerDeployment().waitForScale();
+        logger.info("scaled to {} pods", count);
+    }
+
+    private void addNameToPods() {
         List<Instance> osInstances = deploymentScenario.getKieServerDeployment().getInstances();
         for (Instance i : osInstances) {
             pods.add(i.getName());
